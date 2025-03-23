@@ -1,0 +1,69 @@
+services:
+  angular_app:
+      build:
+        context: ./angular_app
+        dockerfile: Dockerfile
+      container_name: angular_app
+      working_dir: /app
+      volumes:
+        - ./public_html:/app
+      networks:
+        - my_custom_network
+
+  nginx_web:
+    networks:
+        - my_custom_network
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx_web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./public_html:/usr/share/nginx/html 
+      - ./certs:/etc/ssl/certs:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    environment:
+      - NGINX_LOG_DIR=/var/log/nginx
+    depends_on:
+      - mysql_db
+      - angular_app
+
+  sftpgo:
+    build:
+      context: ./sftpgo
+    container_name: sftpgo
+    volumes:
+      - ./sftpgo_data:/var/lib/sftpgo/data
+      - ./public_html:/var/lib/sftpgo/public
+      - ./sftpgo/sftpgo.json:/etc/sftpgo/sftpgo.json
+    environment:
+      - SFTPGO_CONFIG_FILE=/etc/sftpgo/sftpgo.json
+    ports:
+      - "2022:2022"
+      - "8080:8080"
+      - "21:21"
+      - "55000-55010:50000-50010"
+    networks:
+      - my_custom_network
+    restart: unless-stopped
+
+  mysql_db:
+    image: mysql:8.0
+    container_name: mysql_db
+    networks:
+      - my_custom_network
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+networks:
+  my_custom_network:
+    driver: bridge

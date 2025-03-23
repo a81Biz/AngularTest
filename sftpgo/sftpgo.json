@@ -1,0 +1,35 @@
+{
+  "FTPD": {
+    "Enabled": true,
+    "Bindings": [
+      {
+        "Address": "0.0.0.0",
+        "Port": 21
+      }
+    ],
+    "PassivePortRange": {
+      "Start": 50000,
+      "End": 50100
+    },
+    "PassiveExternalIP": "127.0.0.1"
+  },
+  "SFTPD": {
+    "Bindings": [
+      {
+        "Address": "0.0.0.0",
+        "Port": 2022
+      }
+    ]
+  },
+  "HTTPD": {
+    "Bindings": [
+      {
+        "Address": "0.0.0.0",
+        "Port": 8080
+      }
+    ],
+    "EnableWebAdmin": true,
+    "EnableRESTAPI": true,
+    "EnableWebClient": true
+  }
+}

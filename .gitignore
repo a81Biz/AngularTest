@@ -1,0 +1,6 @@
+# Ignora carpetas de volúmenes de Docker y archivos temporales
+public_html/dist/
+mysql_data/
+node_modules/
+.DS_Store
+*.log
